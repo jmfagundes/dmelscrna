@@ -4,7 +4,7 @@
 This page contains all R scripts used for the analysis of viral infections on public single-cell RNA sequencing (scRNA-seq) data from Drosophila melanogaster enteroendocrine cells (EEs) and midgut cells.
 
 ### Overview
-Raw data was downloaded from the sequence read archives (SRA) portal from NCBI (https://www.ncbi.nlm.nih.gov/sra; BioProject accession numbers: PRJNA547484 and PRJNA493298). Gene count matrices were generated with cellranger v3.1.0 using a concatenated reference genome containing the D. melanogaster, Thika virus (TV) and Drosophila melanogaster Nora virus (DMelNV) genomic sequences. Downstream analyses were performed with Seurat v3.1.4 with the R scripts present in the current project, with the exception of GO terms enrichment analysis which was conducted using BiNGO v3.0.4 plugin for Cytoscape v3.7.2.
+Raw data was downloaded from the sequence read archives (SRA) portal from NCBI (https://www.ncbi.nlm.nih.gov/sra; BioProject accession numbers: PRJNA547484 and PRJNA493298). Gene count matrices were generated with cellranger v3.1.0 using a concatenated reference genome containing the D. melanogaster, Thika virus (TV), Drosophila melanogaster Nora virus (DMelNV) genomic sequences and Drosophila C virus. Downstream analyses were performed with Seurat v3.1.4 with the R scripts present in the current project, with the exception of GO terms enrichment analysis which was conducted using BiNGO v3.0.4 plugin for Cytoscape v3.7.2.
 
 #### Contents
 ##### run_analysis.R
