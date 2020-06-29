@@ -1,0 +1,38 @@
+File created with bingo (c) on May 23, 2020 at 10:24:37 AM
+
+ontology: unknown
+curator:  unknown
+
+Selected ontology file : /Users/joaomarcosfagundes/Desktop/analysis_0.3/GO/dmel_go-basic.obo
+Selected annotation file : /Users/joaomarcosfagundes/Desktop/analysis_0.3/GO/gene_association.fb
+Discarded evidence codes : 
+Overrepresentation
+Selected statistical test : Hypergeometric test
+Selected correction : Benjamini & Hochberg False Discovery Rate (FDR) correction
+Selected significance level : 0.05
+Testing option : Use whole annotation as reference set
+The selected cluster :
+CCT3	PECT	CG9568	CG44008	SSK	DER-1	CG34176	ASTC	
+
+No annotations were retrieved for the following entities:
+CG9568	CG34176	
+
+GO-ID	p-value	corr p-value	x	n	X	N	Description	Genes in test set
+60576	4.7483E-4	2.8765E-2	1	1	6	12636	intestinal epithelial cell development	SSK
+10459	1.4239E-3	2.8765E-2	1	3	6	12636	negative regulation of heart rate	ASTC
+45822	1.4239E-3	2.8765E-2	1	3	6	12636	negative regulation of heart contraction	ASTC
+45827	1.4239E-3	2.8765E-2	1	3	6	12636	negative regulation of isoprenoid metabolic process	ASTC
+45928	1.4239E-3	2.8765E-2	1	3	6	12636	negative regulation of juvenile hormone metabolic process	ASTC
+45968	1.4239E-3	2.8765E-2	1	3	6	12636	negative regulation of juvenile hormone biosynthetic process	ASTC
+1903523	1.4239E-3	2.8765E-2	1	3	6	12636	negative regulation of blood circulation	ASTC
+32353	1.8982E-3	2.8765E-2	1	4	6	12636	negative regulation of hormone biosynthetic process	ASTC
+60575	1.8982E-3	2.8765E-2	1	4	6	12636	intestinal epithelial cell differentiation	SSK
+19747	1.8982E-3	2.8765E-2	1	4	6	12636	regulation of isoprenoid metabolic process	ASTC
+7496	1.8982E-3	2.8765E-2	1	4	6	12636	anterior midgut development	SSK
+7556	1.8982E-3	2.8765E-2	1	4	6	12636	regulation of juvenile hormone metabolic process	ASTC
+7557	1.8982E-3	2.8765E-2	1	4	6	12636	regulation of juvenile hormone biosynthetic process	ASTC
+32351	2.3723E-3	3.1156E-2	1	5	6	12636	negative regulation of hormone metabolic process	ASTC
+42439	2.3723E-3	3.1156E-2	1	5	6	12636	ethanolamine-containing compound metabolic process	PECT
+6646	2.8462E-3	3.5044E-2	1	6	6	12636	phosphatidylethanolamine biosynthetic process	PECT
+46337	3.3199E-3	3.6334E-2	1	7	6	12636	phosphatidylethanolamine metabolic process	PECT
+51055	3.3199E-3	3.6334E-2	1	7	6	12636	negative regulation of lipid biosynthetic process	ASTC

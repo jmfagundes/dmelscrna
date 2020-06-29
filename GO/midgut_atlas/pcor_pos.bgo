@@ -1,0 +1,86 @@
+File created with bingo (c) on Jun 23, 2020 at 11:12:42 AM
+
+ontology: unknown
+curator:  unknown
+
+Selected ontology file : /Users/joaomarcosfagundes/Dropbox/dmel_scRNA-seq/analysis_0.3/GO/dmel_go-basic.obo
+Selected annotation file : /Users/joaomarcosfagundes/Dropbox/dmel_scRNA-seq/analysis_0.3/GO/gene_association.fb
+Discarded evidence codes : 
+Overrepresentation
+Selected statistical test : Hypergeometric test
+Selected correction : Benjamini & Hochberg False Discovery Rate (FDR) correction
+Selected significance level : 0.05
+Testing option : Use whole annotation as reference set
+The selected cluster :
+FER1HCH	CG13321	CG44008	REF(2)P	FER2LCH	
+
+No annotations were retrieved for the following entities:
+CG13321	
+
+GO-ID	p-value	corr p-value	x	n	X	N	Description	Genes in test set
+1990461	7.5162E-8	3.0065E-6	2	2	4	12636	detoxification of iron ion	FER1HCH|FER2LCH
+98711	7.5162E-8	3.0065E-6	2	2	4	12636	iron ion import across plasma membrane	FER1HCH|FER2LCH
+33212	7.5162E-8	3.0065E-6	2	2	4	12636	iron import into cell	FER1HCH|FER2LCH
+51238	2.2546E-7	3.8650E-6	2	3	4	12636	sequestering of metal ion	FER1HCH|FER2LCH
+97577	2.2546E-7	3.8650E-6	2	3	4	12636	sequestering of iron ion	FER1HCH|FER2LCH
+6880	2.2546E-7	3.8650E-6	2	3	4	12636	intracellular sequestering of iron ion	FER1HCH|FER2LCH
+61687	2.2546E-7	3.8650E-6	2	3	4	12636	detoxification of inorganic compound	FER1HCH|FER2LCH
+34755	4.5087E-7	6.7631E-6	2	4	4	12636	iron ion transmembrane transport	FER1HCH|FER2LCH
+10039	1.1269E-6	1.5026E-5	2	6	4	12636	response to iron ion	FER1HCH|FER2LCH
+6879	3.3794E-6	4.0553E-5	2	10	4	12636	cellular iron ion homeostasis	FER1HCH|FER2LCH
+6826	5.8558E-6	6.3882E-5	2	13	4	12636	iron ion transport	FER1HCH|FER2LCH
+55072	1.2830E-5	1.2830E-4	2	19	4	12636	iron ion homeostasis	FER1HCH|FER2LCH
+46916	2.0696E-5	1.9104E-4	2	24	4	12636	cellular transition metal ion homeostasis	FER1HCH|FER2LCH
+99587	2.4366E-5	1.9493E-4	2	26	4	12636	inorganic ion import across plasma membrane	FER1HCH|FER2LCH
+98659	2.4366E-5	1.9493E-4	2	26	4	12636	inorganic cation import across plasma membrane	FER1HCH|FER2LCH
+98754	4.2023E-5	3.1518E-4	2	34	4	12636	detoxification	FER1HCH|FER2LCH
+98739	4.7182E-5	3.3305E-4	2	36	4	12636	import across plasma membrane	FER1HCH|FER2LCH
+41	5.2638E-5	3.5092E-4	2	38	4	12636	transition metal ion transport	FER1HCH|FER2LCH
+98657	6.1379E-5	3.8665E-4	2	41	4	12636	import into cell	FER1HCH|FER2LCH
+51651	6.4441E-5	3.8665E-4	2	42	4	12636	maintenance of location in cell	FER1HCH|FER2LCH
+55076	7.4073E-5	4.2327E-4	2	45	4	12636	transition metal ion homeostasis	FER1HCH|FER2LCH
+10038	1.0697E-4	5.8346E-4	2	54	4	12636	response to metal ion	FER1HCH|FER2LCH
+9620	1.4585E-4	7.6094E-4	2	63	4	12636	response to fungus	FER1HCH|FER2LCH
+51235	1.8542E-4	9.2710E-4	2	71	4	12636	maintenance of location	FER1HCH|FER2LCH
+10035	2.9823E-4	1.4069E-3	2	90	4	12636	response to inorganic substance	FER1HCH|FER2LCH
+6875	3.0490E-4	1.4069E-3	2	91	4	12636	cellular metal ion homeostasis	FER1HCH|FER2LCH
+35973	3.1656E-4	1.4069E-3	1	1	4	12636	aggrephagy	REF(2)P
+30003	5.1251E-4	2.1931E-3	2	118	4	12636	cellular cation homeostasis	FER1HCH|FER2LCH
+6873	5.2999E-4	2.1931E-3	2	120	4	12636	cellular ion homeostasis	FER1HCH|FER2LCH
+55065	5.6583E-4	2.2633E-3	2	124	4	12636	metal ion homeostasis	FER1HCH|FER2LCH
+55082	6.7033E-4	2.5948E-3	2	135	4	12636	cellular chemical homeostasis	FER1HCH|FER2LCH
+98771	8.3788E-4	3.0871E-3	2	151	4	12636	inorganic ion homeostasis	FER1HCH|FER2LCH
+55080	8.4896E-4	3.0871E-3	2	152	4	12636	cation homeostasis	FER1HCH|FER2LCH
+50801	9.5191E-4	3.3597E-3	2	161	4	12636	ion homeostasis	FER1HCH|FER2LCH
+9636	1.0731E-3	3.6792E-3	2	171	4	12636	response to toxic substance	FER1HCH|FER2LCH
+98662	1.1236E-3	3.7452E-3	2	175	4	12636	inorganic cation transmembrane transport	FER1HCH|FER2LCH
+423	1.2658E-3	4.0476E-3	1	4	4	12636	mitophagy	REF(2)P
+30001	1.2818E-3	4.0476E-3	2	187	4	12636	metal ion transport	FER1HCH|FER2LCH
+98655	1.3788E-3	4.2423E-3	2	194	4	12636	cation transmembrane transport	FER1HCH|FER2LCH
+98660	1.4214E-3	4.2641E-3	2	197	4	12636	inorganic ion transmembrane transport	FER1HCH|FER2LCH
+19725	2.3513E-3	6.8818E-3	2	254	4	12636	cellular homeostasis	FER1HCH|FER2LCH
+48878	2.7706E-3	7.9159E-3	2	276	4	12636	chemical homeostasis	FER1HCH|FER2LCH
+30382	2.8463E-3	7.9432E-3	1	9	4	12636	sperm mitochondrion organization	REF(2)P
+34220	2.9517E-3	8.0501E-3	2	285	4	12636	ion transmembrane transport	FER1HCH|FER2LCH
+6812	3.3523E-3	8.9395E-3	2	304	4	12636	cation transport	FER1HCH|FER2LCH
+61912	5.0559E-3	1.3189E-2	1	16	4	12636	selective autophagy	REF(2)P
+7032	5.3712E-3	1.3196E-2	1	17	4	12636	endosome organization	REF(2)P
+9607	5.4981E-3	1.3196E-2	2	391	4	12636	response to biotic stimulus	FER1HCH|FER2LCH
+43207	5.4981E-3	1.3196E-2	2	391	4	12636	response to external biotic stimulus	FER1HCH|FER2LCH
+51707	5.4981E-3	1.3196E-2	2	391	4	12636	response to other organism	FER1HCH|FER2LCH
+44419	5.6647E-3	1.3329E-2	2	397	4	12636	interspecies interaction between organisms	FER1HCH|FER2LCH
+61726	7.8914E-3	1.7867E-2	1	25	4	12636	mitochondrion disassembly	REF(2)P
+422	7.8914E-3	1.7867E-2	1	25	4	12636	autophagy of mitochondrion	REF(2)P
+6811	8.8217E-3	1.9604E-2	2	498	4	12636	ion transport	FER1HCH|FER2LCH
+42592	9.4532E-3	2.0625E-2	2	516	4	12636	homeostatic process	FER1HCH|FER2LCH
+1903008	1.0093E-2	2.1627E-2	1	32	4	12636	organelle disassembly	REF(2)P
+10466	1.2290E-2	2.5874E-2	1	39	4	12636	negative regulation of peptidase activity	CG44008
+55085	1.3457E-2	2.7843E-2	2	619	4	12636	transmembrane transport	FER1HCH|FER2LCH
+45861	1.6362E-2	3.3278E-2	1	52	4	12636	negative regulation of proteolysis	CG44008
+16236	1.8549E-2	3.7097E-2	1	59	4	12636	macroautophagy	REF(2)P
+51346	1.9173E-2	3.7712E-2	1	61	4	12636	negative regulation of hydrolase activity	CG44008
+45475	1.9485E-2	3.7712E-2	1	62	4	12636	locomotor rhythm	FER2LCH
+51649	2.1836E-2	4.1209E-2	2	796	4	12636	establishment of localization in cell	FER1HCH|FER2LCH
+48512	2.1978E-2	4.1209E-2	1	70	4	12636	circadian behavior	FER2LCH
+7622	2.2601E-2	4.1724E-2	1	72	4	12636	rhythmic behavior	FER2LCH
+52547	2.3845E-2	4.3354E-2	1	76	4	12636	regulation of peptidase activity	CG44008

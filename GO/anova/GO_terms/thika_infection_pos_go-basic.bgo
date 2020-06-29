@@ -1,0 +1,37 @@
+File created with bingo (c) on May 23, 2020 at 10:25:33 AM
+
+ontology: unknown
+curator:  unknown
+
+Selected ontology file : /Users/joaomarcosfagundes/Desktop/analysis_0.3/GO/dmel_go-basic.obo
+Selected annotation file : /Users/joaomarcosfagundes/Desktop/analysis_0.3/GO/gene_association.fb
+Discarded evidence codes : 
+Overrepresentation
+Selected statistical test : Hypergeometric test
+Selected correction : Benjamini & Hochberg False Discovery Rate (FDR) correction
+Selected significance level : 0.05
+Testing option : Use whole annotation as reference set
+The selected cluster :
+CCT3	TSP42EC	PECT	CG12825	CG14989	PEBP1	CG44008	SSK	DER-1	PRE-RRNA:CR45845	CG9568	CG13321	MT:LRRNA	CG34176	ASTC	IA-2	
+
+No annotations were retrieved for the following entities:
+TSP42EC	PRE-RRNA:CR45845	CG12825	CG9568	CG14989	CG13321	CG34176	
+
+GO-ID	p-value	corr p-value	x	n	X	N	Description	Genes in test set
+60576	7.1225E-4	4.4402E-2	1	1	9	12636	intestinal epithelial cell development	SSK
+10459	2.1354E-3	4.4402E-2	1	3	9	12636	negative regulation of heart rate	ASTC
+45822	2.1354E-3	4.4402E-2	1	3	9	12636	negative regulation of heart contraction	ASTC
+45827	2.1354E-3	4.4402E-2	1	3	9	12636	negative regulation of isoprenoid metabolic process	ASTC
+45928	2.1354E-3	4.4402E-2	1	3	9	12636	negative regulation of juvenile hormone metabolic process	ASTC
+45968	2.1354E-3	4.4402E-2	1	3	9	12636	negative regulation of juvenile hormone biosynthetic process	ASTC
+1903523	2.1354E-3	4.4402E-2	1	3	9	12636	negative regulation of blood circulation	ASTC
+55123	2.8352E-3	4.4402E-2	2	115	9	12636	digestive system development	SSK|IA-2
+48565	2.8352E-3	4.4402E-2	2	115	9	12636	digestive tract development	SSK|IA-2
+32353	2.8463E-3	4.4402E-2	1	4	9	12636	negative regulation of hormone biosynthetic process	ASTC
+60575	2.8463E-3	4.4402E-2	1	4	9	12636	intestinal epithelial cell differentiation	SSK
+19747	2.8463E-3	4.4402E-2	1	4	9	12636	regulation of isoprenoid metabolic process	ASTC
+7496	2.8463E-3	4.4402E-2	1	4	9	12636	anterior midgut development	SSK
+7556	2.8463E-3	4.4402E-2	1	4	9	12636	regulation of juvenile hormone metabolic process	ASTC
+7557	2.8463E-3	4.4402E-2	1	4	9	12636	regulation of juvenile hormone biosynthetic process	ASTC
+32351	3.5567E-3	4.8958E-2	1	5	9	12636	negative regulation of hormone metabolic process	ASTC
+42439	3.5567E-3	4.8958E-2	1	5	9	12636	ethanolamine-containing compound metabolic process	PECT

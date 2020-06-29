@@ -1,0 +1,4 @@
+mt:lrRNA
+Tsp42Ec
+CG14989
+CDC50
