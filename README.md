@@ -4,7 +4,7 @@
 This page contains all R scripts used for the analysis of viral infections on public single-cell RNA sequencing (scRNA-seq) data from Drosophila melanogaster enteroendocrine cells (EEs) and midgut cells.
 
 ### Overview
-Raw data was downloaded from the sequence read archives (SRA) portal from NCBI (https://www.ncbi.nlm.nih.gov/sra; BioProject accession numbers: PRJNA547484 and PRJNA493298). Gene count matrices were generated with cellranger v3.1.0 using a concatenated reference genome containing the D. melanogaster, Thika virus (TV), Drosophila melanogaster Nora virus (DMelNV) genomic sequences and Drosophila C virus. Downstream analyses were performed with Seurat v3.1.4 with the R scripts present in the current project, with the exception of GO terms enrichment analysis which was conducted using BiNGO v3.0.4 plugin for Cytoscape v3.7.2.
+Raw data was downloaded from the sequence read archives (SRA) portal from NCBI (https://www.ncbi.nlm.nih.gov/sra; BioProject accession numbers: PRJNA547484 and PRJNA493298). Gene count matrices were generated with cellranger v3.1.0 using a concatenated reference genome containing the D. melanogaster, Thika virus (TV), Drosophila melanogaster Nora virus (DMelNV) genomic sequences and Drosophila C virus (DCV). Downstream analyses were performed with Seurat v3.1.4 with the R scripts present in the current project, with the exception of GO terms enrichment analysis which was conducted using BiNGO v3.0.4 plugin for Cytoscape v3.7.2.
 
 #### Contents
 ##### run_analysis.R
@@ -40,6 +40,7 @@ File to convert gene IDs to symbol.
 #### References
 ##### cellranger
 10X Genomics, CA, USA
+
 https://support.10xgenomics.com/single-cell-gene-expression/software/overview/welcome
 
 ##### Seurat
@@ -53,12 +54,15 @@ Shannon, P., Markiel, A., Ozier, O., Baliga, N.S., Wang, J.T., Ramage, D., Amin,
 
 ##### scRNA-seq data
 Guo, X., Yin, C., Yang, F., Zhang, Y., Huang, H., Wang, J., Deng, B., Cai T., Rao, Y., and Xi, R. (2019). The cellular diversity and transcription factor code of Drosophila enteroendocrine cells. Cell Rep. 29, 4172-4185.
+
 Hung, R.J., Hu, Y., Kirchner, R., Liu, Y., Xu, C., Comjean, A., Tattikota, S.G., Li, F., Song, W., Sui, S.H. and Perrimon, N. (2020). A cell atlas of the adult Drosophila midgut. Proc. Natl. Acad. Sci. USA. 21, 1514-1523.
 
 ##### bulk RNA-seq data
 Lopez, W., Page, A.M., Carlson, D.J., Ericson, B.L., Cserhati, M.F., Guda, C. and Carlson, K.A. (2018). Analysis of immune-related genes during Nora virus infection of Drosophila melanogaster using next generation sequencing. AIMS Microbiol. 4, 123.
+
 This data is available under the https://creativecommons.org/licenses/by/4.0/ license. Minor changes to the original file format were made.
 
 ##### D. melanogaster interactome
 Ding, X.B., Jin, J., Tao, Y.T., Guo, W.P., Ruan, L., Yang, Q.L., Chen, P.C., Yao, H., Zhang, H.B. and Chen, X. (2020). Predicted Drosophila Interactome Resource and web tool for functional interpretation of differentially expressed genes. Database 2020, baaa005.
+
 http://drosophila.biomedtzc.cn/#/download
