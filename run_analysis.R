@@ -406,11 +406,6 @@ up_down_fun <- function(obj_vir,
 ## EEs analysis ##
 ##################
 
-# load raw matrix from the original study for comparison
-
-GSE_raw.data <- Read10X(data.dir = "gene_matrices/GSE132274_RAW/")
-GSE_raw <- CreateSeuratObject(counts = GSE_raw.data, project = "GSE_raw", min.cells = 3, min.features = 200)
-
 # load EE data
 
 dmel.data <- Read10X(data.dir = "gene_matrices/EE_cellranger_out/")

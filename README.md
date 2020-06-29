@@ -57,6 +57,8 @@ Hung, R.J., Hu, Y., Kirchner, R., Liu, Y., Xu, C., Comjean, A., Tattikota, S.G.,
 
 ##### bulk RNA-seq data
 Lopez, W., Page, A.M., Carlson, D.J., Ericson, B.L., Cserhati, M.F., Guda, C. and Carlson, K.A. (2018). Analysis of immune-related genes during Nora virus infection of Drosophila melanogaster using next generation sequencing. AIMS Microbiol. 4, 123.
+This data is available under the https://creativecommons.org/licenses/by/4.0/ license. Minor changes to the original file format were made.
 
 ##### D. melanogaster interactome
 Ding, X.B., Jin, J., Tao, Y.T., Guo, W.P., Ruan, L., Yang, Q.L., Chen, P.C., Yao, H., Zhang, H.B. and Chen, X. (2020). Predicted Drosophila Interactome Resource and web tool for functional interpretation of differentially expressed genes. Database 2020, baaa005.
+http://drosophila.biomedtzc.cn/#/download
