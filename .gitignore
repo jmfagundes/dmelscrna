@@ -1,8 +1,7 @@
-# ignore large files
-# these will be produced by run_analysis.R
-
-sensitivity_curve/dmel_no_vir.Rdata
-sensitivity_curve/mda_10x_uninfected.Rdata
+objs/
+cellbender/
+figures_out/
+Supplementary*.xlsx
 
 # some R files
 
