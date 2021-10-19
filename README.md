@@ -20,7 +20,7 @@ Determination of infected cells and ifection dynamics analysis.
 Differential expression analysis with glmGamPoi.
 
 ##### graph_glmGamPoi_DE.R
-Network and reactome analysis.
+Network, reactome and heat shock response analyses.
 
 ##### gene_matrices/
 Contains count matrices, as well as a list of DEGs from bulk RNA-seq data from DMelNV-infected flies.
@@ -28,8 +28,14 @@ Contains count matrices, as well as a list of DEGs from bulk RNA-seq data from D
 ##### network/
 Contains the D. melanogaster interactome files.
 
+##### SCENIC/
+Contains scripts used to perform regulon activity analyses.
+
 ##### name_id_symbol_list
 File to convert gene IDs to symbol.
+
+##### Participating Molecules [R-DME-3371556].tsv
+Heat shock response genes from reactome.org.
 
 #### References
 ##### cellranger
@@ -60,6 +66,8 @@ This data is available under the https://creativecommons.org/licenses/by/4.0/ li
 Ding, X.B., Jin, J., Tao, Y.T., Guo, W.P., Ruan, L., Yang, Q.L., Chen, P.C., Yao, H., Zhang, H.B. and Chen, X. (2020). Predicted Drosophila Interactome Resource and web tool for functional interpretation of differentially expressed genes. Database 2020, baaa005.
 
 http://drosophila.biomedtzc.cn/#/download
+
+The pre_processing.R script was run in the following R environment:
 
 ```
 > sessionInfo()
@@ -114,4 +122,65 @@ loaded via a namespace (and not attached):
 [145] codetools_0.2-16          fgsea_1.16.0              lattice_0.20-41           curl_4.3                  leiden_0.3.7              zip_2.1.1                
 [151] GO.db_3.12.1              openxlsx_4.2.3            survival_3.2-7            munsell_0.5.0             DO.db_2.9                 rhdf5_2.34.0             
 [157] GenomeInfoDbData_1.2.4    HDF5Array_1.18.0          labelled_2.7.0            haven_2.3.1               gtable_0.3.0
+```
+
+All other scripts were run in the following environment:
+
+```
+> sessionInfo()
+R version 4.0.3 (2020-10-10)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows 10 x64 (build 19042)
+
+Matrix products: default
+
+locale:
+[1] LC_COLLATE=English_United States.1252  LC_CTYPE=English_United States.1252    LC_MONETARY=English_United States.1252 LC_NUMERIC=C                          
+[5] LC_TIME=English_United States.1252    
+
+attached base packages:
+ [1] grid      parallel  stats4    stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] multcomp_1.4-17             TH.data_1.0-10              MASS_7.3-53                 survival_3.2-7              mvtnorm_1.1-2              
+ [6] doParallel_1.0.16           doSNOW_1.0.19               snow_0.4-3                  iterators_1.0.13            foreach_1.5.1              
+[11] SCENIC_1.2.4                ggraph_2.0.5                writexl_1.4.0               ggrepel_0.9.1               DropletUtils_1.10.3        
+[16] SingleCellExperiment_1.12.0 SummarizedExperiment_1.20.0 Biobase_2.50.0              GenomicRanges_1.42.0        GenomeInfoDb_1.26.7        
+[21] IRanges_2.24.1              S4Vectors_0.28.1            BiocGenerics_0.36.1         MatrixGenerics_1.2.1        matrixStats_0.60.0         
+[26] ReactomePA_1.34.0           glmGamPoi_1.2.0             broom_0.7.9                 car_3.0-11                  carData_3.0-4              
+[31] data.table_1.14.0           forcats_0.5.1               stringr_1.4.0               purrr_0.3.4                 readr_2.0.1                
+[36] tidyr_1.1.3                 tidyverse_1.3.1             igraph_1.2.6                ggforce_0.3.3               agricolae_1.3-5            
+[41] gridExtra_2.3               ggpubr_0.4.0                reshape2_1.4.4              limma_3.46.0                sctransform_0.3.2          
+[46] ggplot2_3.3.5               viridis_0.6.1               viridisLite_0.4.0           tibble_3.1.3                dplyr_1.0.7                
+[51] SeuratObject_4.0.2          Seurat_4.0.4               
+
+loaded via a namespace (and not attached):
+  [1] rappdirs_0.3.3            scattermore_0.7           R.methodsS3_1.8.1         bit64_4.0.5               irlba_2.3.3               DelayedArray_0.16.3      
+  [7] R.utils_2.10.1            rpart_4.1-15              RCurl_1.98-1.2            generics_0.1.0            cowplot_1.1.1             RSQLite_2.2.8            
+ [13] shadowtext_0.0.8          RANN_2.6.1                combinat_0.0-8            future_1.21.0             bit_4.0.4                 tzdb_0.1.2               
+ [19] enrichplot_1.10.2         spatstat.data_2.1-0       xml2_1.3.2                lubridate_1.7.10          httpuv_1.6.2              assertthat_0.2.1         
+ [25] hms_1.1.0                 promises_1.2.0.1          fansi_0.5.0               dbplyr_2.1.1              readxl_1.3.1              DBI_1.1.1                
+ [31] htmlwidgets_1.5.3         spatstat.geom_2.2-2       ellipsis_0.3.2            backports_1.2.1           annotate_1.68.0           deldir_0.2-10            
+ [37] sparseMatrixStats_1.2.1   vctrs_0.3.8               ROCR_1.0-11               abind_1.4-5               cachem_1.0.6              withr_2.4.2              
+ [43] checkmate_2.0.0           goftest_1.2-2             cluster_2.1.0             DOSE_3.16.0               lazyeval_0.2.2            crayon_1.4.1             
+ [49] edgeR_3.32.1              pkgconfig_2.0.3           tweenr_1.0.2              nlme_3.1-149              rlang_0.4.11              globals_0.14.0           
+ [55] questionr_0.7.4           lifecycle_1.0.0           miniUI_0.1.1.1            sandwich_3.0-1            modelr_0.1.8              cellranger_1.1.0         
+ [61] polyclip_1.10-0           lmtest_0.9-38             graph_1.68.0              Matrix_1.3-4              Rhdf5lib_1.12.1           zoo_1.8-9                
+ [67] reprex_2.0.1              ggridges_0.5.3            png_0.1-7                 bitops_1.0-7              R.oo_1.24.0               KernSmooth_2.23-17       
+ [73] rhdf5filters_1.2.1        blob_1.2.2                DelayedMatrixStats_1.12.3 qvalue_2.22.0             parallelly_1.27.0         rstatix_0.7.0            
+ [79] ggsignif_0.6.2            klaR_0.6-15               reactome.db_1.74.0        beachmat_2.6.4            scales_1.1.1              GSEABase_1.52.1          
+ [85] memoise_2.0.0             graphite_1.36.0           magrittr_2.0.1            plyr_1.8.6                ica_1.0-2                 zlibbioc_1.36.0          
+ [91] compiler_4.0.3            scatterpie_0.1.7          dqrng_0.3.0               RColorBrewer_1.1-2        fitdistrplus_1.1-5        cli_3.0.1                
+ [97] XVector_0.30.0            listenv_0.8.0             patchwork_1.1.1           pbapply_1.4-3             mgcv_1.8-33               tidyselect_1.1.1         
+[103] stringi_1.7.3             highr_0.9                 GOSemSim_2.16.1           locfit_1.5-9.4            fastmatch_1.1-3           tools_4.0.3              
+[109] future.apply_1.8.1        rio_0.5.27                rstudioapi_0.13           foreign_0.8-80            AUCell_1.12.0             farver_2.1.0             
+[115] Rtsne_0.15                digest_0.6.27             shiny_1.6.0               Rcpp_1.0.7                scuttle_1.0.4             later_1.3.0              
+[121] RcppAnnoy_0.0.19          httr_1.4.2                AnnotationDbi_1.52.0      colorspace_2.0-2          XML_3.99-0.5              rvest_1.0.1              
+[127] fs_1.5.0                  tensor_1.5                reticulate_1.20           splines_4.0.3             uwot_0.1.10               spatstat.utils_2.2-0     
+[133] graphlayouts_0.7.1        plotly_4.9.4.1            xtable_1.8-4              jsonlite_1.7.2            AlgDesign_1.2.0           tidygraph_1.2.0          
+[139] ggfun_0.0.3               R6_2.5.1                  pillar_1.6.2              htmltools_0.5.1.1         mime_0.11                 glue_1.4.2               
+[145] fastmap_1.1.0             BiocParallel_1.24.1       codetools_0.2-16          fgsea_1.16.0              utf8_1.2.2                lattice_0.20-41          
+[151] spatstat.sparse_2.0-0     curl_4.3.2                leiden_0.3.9              zip_2.2.0                 GO.db_3.12.1              openxlsx_4.2.4           
+[157] munsell_0.5.0             DO.db_2.9                 rhdf5_2.34.0              GenomeInfoDbData_1.2.4    HDF5Array_1.18.1          labelled_2.8.0           
+[163] haven_2.4.3               gtable_0.3.0              spatstat.core_2.3-0
 ```

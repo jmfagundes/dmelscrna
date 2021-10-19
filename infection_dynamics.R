@@ -81,38 +81,6 @@ infect.stats <- data.frame(cell = levels(virus_pct_per_cell$cell),
                            tv.n.infected_cells = table(virus_pct_per_cell[virus_pct_per_cell$tv.infection & !virus_pct_per_cell$dmelnv.infection, "cell"]) %>% as.numeric(),
                            dmelnv.n.infected_cells = table(virus_pct_per_cell[virus_pct_per_cell$dmelnv.infection & !virus_pct_per_cell$tv.infection, "cell"]) %>% as.numeric())
 
-# integrate EEs from both datasets
-
-EE_mda <- subset(mda_10x_merged, idents = "EE")
-DefaultAssay(dmel_filtered) <- "NOVIR"
-DefaultAssay(EE_mda) <- "NOVIR"
-
-EE.lst <- list(EE = FindVariableFeatures(dmel_filtered, nfeatures = 5000),
-               mda = FindVariableFeatures(EE_mda, nfeatures = 5000))
-
-EE_anchors <- FindIntegrationAnchors(object.list = EE.lst,
-                                     dims = 1:25, k.filter = 50)
-
-EE_mda_merged <- IntegrateData(EE_anchors, dims = 1:25)
-EE_mda_merged$orig.cell.type <- EE_mda_merged@active.ident
-EE_mda_merged <- ScaleData(EE_mda_merged)
-EE_mda_merged <- RunPCA(EE_mda_merged, features = VariableFeatures(object = EE_mda_merged))
-EE_mda_merged <- FindNeighbors(EE_mda_merged, dims = 1:25)
-EE_mda_merged <- FindClusters(EE_mda_merged, resolution = 0.4)
-EE_mda_merged <- RunTSNE(EE_mda_merged, dims = 1:25)
-
-# reannotate
-
-# cluster                 0       1       2         3        4         5         6         7          8       9      10     11     12
-EE_new.cluster.ids <- c("I-m", "II-m1", "II-a", "I-ap-p", "II-m2", "I-pAstA", "II-p", "I-pCCHa1", "I-ap-a", "I-a", "I-m", "III", "EEP")
-names(EE_new.cluster.ids) <- levels(EE_mda_merged)
-EE_mda_merged <- RenameIdents(EE_mda_merged, EE_new.cluster.ids)
-DimPlot(EE_mda_merged, reduction = "tsne", label = TRUE, pt.size = 0.5)
-
-# check EE subtypes infected with DMelNV in MA dataset
-
-EE_mda_merged@active.ident[colnames(EE_mda_merged) %in% colnames(mda_10x_merged)[mda_10x_merged$is.dmelnv.infected]]
-
 ## Figs
 # number of infected cells barplot
 
@@ -149,21 +117,6 @@ g <- arrangeGrob(gg_tv.pct, gg_dv.pct,
                  cells_barplot, prob_inf, nrow = 3)
 
 ggsave("figures_out/fig2.pdf", g, width = 174, height = 234, units = "mm")
-
-# correlation between mean expression and virus susceptibility
-# see if correlated genes are DE between cell types
-
-load("objs/glm.vir_glmGamPoi.Rdata")
-
-EE.uninfected.seu <- subset(dmel_filtered, subset = percent.thika == 0 & percent.nora == 0 & percent.dmelc == 0,
-                            idents = c("I-m", "II-m1", "I-ap-p", "II-a", "II-m2", "I-pAstA", "I-pCCHa1", "II-p", "I-ap-a", "I-a", "III"))
-
-# log-normalize based on size factors obtained from glmGamPoi
-
-EE.uninfected.seu[["CELLBENDER"]]@data <- t(glm.vir$EE$fit$size_factors[match(colnames(EE.uninfected.seu), names(glm.vir$EE$fit$size_factors))]*
-                                              t(EE.uninfected.seu@assays$CELLBENDER@counts)) %>% log1p()
-
-EE.mean.exp <- AverageExpression(EE.uninfected.seu, assays = "CELLBENDER", slot = "data")
 
 # investigate whether infection can change cell clusters
 
