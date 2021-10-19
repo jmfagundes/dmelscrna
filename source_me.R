@@ -22,12 +22,14 @@ library(ReactomePA)
 library(DropletUtils)
 library(ggrepel)
 library(writexl)
+library(ggraph)
+library(grid)
 
 # create folders that will contain output files
 
 dir.create("objs") # precessed Seurat objects and DE analysis results
 dir.create("cellbender") # CellBender analysis should be performed on this directory
-dir.create("figure_out") # output figures
+dir.create("figures_out") # output figures
 
 # table to convert ids <-> symbol <-> name 
 
@@ -48,50 +50,50 @@ gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR41609", 5740375, "28SrRNA-P
 gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR45853", 26067181, "28SrRNA-Psi:CR45853")
 gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR41602", 5740420, "28SrRNA-Psi:CR41602")
 gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG7298", 40210, "CG7298")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR45855", 26067183, "28SrRNA-Psi:CR45855")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR45857", 26067185, "5.8SrRNA-Psi:CR45857")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR45860", 26067188, "28SrRNA-Psi:CR45860")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG4184", 33223, "MED15")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG14031", 33756, "Cyp4ac3")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG31713", 318908, "Apf")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG5603", 34380, "CYLD")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG10846", 34873, "DCTN5-p25")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG10195", 35228, "CG10195")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG34392", 35588, "Epac")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG5498", 40250, "CG5498")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG33217", 2768951, "CG33217")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG11984", 41082, "Kcmf1")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG43143", 41256, "Nuak1")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG6195", 42343, "CG6195")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG10618", 43067, "CHKov1")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR45848", 26067176, "28SrRNA-Psi:CR4584")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR45849", 26067177, "5.8SrRNA-Psi:CR45849")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34077", 19893543, "trnA")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34078", 19893544, "trnR")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34095", 19893561, "trnV")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR45863", 26067191, "5.8SrRNA-Psi:CR45863")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG6711", 39164, "Taf2")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG18596", 42622, "CG18596")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG11839", 43006, "CG11839")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34075", 19893541, "trnG")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34079", 19893545, "trnN")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34080", 19893546, "trnS2")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34093", 19893559, "trnL2")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG3206", 31207, "Or2a")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG15899", 31550, "Ca-alpha1T")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG42395", 7354436, "CG42395")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG7068", 34045, "Tep3")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG33267", 2768969, "CG33267")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG6284", 41254, "Sirt6")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34064", 19893530, "trnW")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34066", 19893532, "trnY")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34068", 19893534, "trnL1")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34070", 19893536, "trnK")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34071", 19893537, "trnD")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR45851", 26067179, "28SrRNA-Psi:CR45851")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34065", 19893531, "trnC")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CR34082", 19893548, "trnF")
-gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel-CG32261", 117481, "Gr64a")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR45855", 26067183, "28SrRNA-Psi:CR45855")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR45857", 26067185, "5.8SrRNA-Psi:CR45857")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR45860", 26067188, "28SrRNA-Psi:CR45860")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG4184", 33223, "MED15")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG14031", 33756, "Cyp4ac3")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG31713", 318908, "Apf")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG5603", 34380, "CYLD")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG10846", 34873, "DCTN5-p25")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG10195", 35228, "CG10195")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG34392", 35588, "Epac")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG5498", 40250, "CG5498")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG33217", 2768951, "CG33217")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG11984", 41082, "Kcmf1")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG43143", 41256, "Nuak1")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG6195", 42343, "CG6195")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG10618", 43067, "CHKov1")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR45848", 26067176, "28SrRNA-Psi:CR4584")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR45849", 26067177, "5.8SrRNA-Psi:CR45849")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34077", 19893543, "trnA")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34078", 19893544, "trnR")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34095", 19893561, "trnV")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR45863", 26067191, "5.8SrRNA-Psi:CR45863")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG6711", 39164, "Taf2")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG18596", 42622, "CG18596")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG11839", 43006, "CG11839")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34075", 19893541, "trnG")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34079", 19893545, "trnN")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34080", 19893546, "trnS2")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34093", 19893559, "trnL2")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG3206", 31207, "Or2a")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG15899", 31550, "Ca-alpha1T")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG42395", 7354436, "CG42395")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG7068", 34045, "Tep3")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG33267", 2768969, "CG33267")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG6284", 41254, "Sirt6")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34064", 19893530, "trnW")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34066", 19893532, "trnY")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34068", 19893534, "trnL1")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34070", 19893536, "trnK")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34071", 19893537, "trnD")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR45851", 26067179, "28SrRNA-Psi:CR45851")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34065", 19893531, "trnC")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CR34082", 19893548, "trnF")
+gene_symbol[nrow(gene_symbol) + 1, ] <- list("Dmel_CG32261", 117481, "Gr64a")
 
 # calculate a threshold for each cell to call them infected with DMelNV based on the percentage of ambient RNA and percentage of viral RNA in the ambient RNA
 # no TV reads were found in empty cells
@@ -145,16 +147,23 @@ DE_gGP <- function(EE.seu, MA.seu,
   
   # uninfected cells only will be selected if they have 0% viral reads
   
-  obj_tv <- subset(EE.seu, cells = colnames(EE.seu)[EE.seu$is.tv.infected])
-  obj_dmelnv_EE <- subset(EE.seu, cells = colnames(EE.seu)[EE.seu$is.dmelnv.infected])
+  # EE objs
+  
+  obj_tv <- subset(EE.seu, cells = colnames(EE.seu)[EE.seu$is.tv.infected & !EE.seu$is.dmelnv.infected])
+  obj_dmelnv_EE <- subset(EE.seu, cells = colnames(EE.seu)[EE.seu$is.dmelnv.infected & !EE.seu$is.tv.infected])
+  obj_coinf_EE <- subset(EE.seu, cells = colnames(EE.seu)[EE.seu$is.dmelnv.infected & EE.seu$is.tv.infected])
   obj_EE_no_vir <- subset(EE.seu, subset = percent.thika == 0 & percent.nora == 0 & percent.dmelc == 0,
                           idents = c(obj_tv@active.ident %>% as.character(),
                                      obj_dmelnv_EE@active.ident %>% as.character()) %>% unique())
   
+  # MA obj
+  
   obj_dmelnv_MA <- subset(MA.seu, cells = colnames(MA.seu)[MA.seu$is.dmelnv.infected])
   obj_MA_no_vir <- subset(MA.seu, subset = percent.nora == 0,
                           idents = obj_dmelnv_MA@active.ident %>% unique())
-
+  
+  # EE counts and factors
+  
   count_tv <- obj_tv@assays$CELLBENDER@counts
   status_tv_EE <- rep("TV_infected", ncol(count_tv))
   cells_tv_EE <- obj_tv@active.ident %>% as.character()
@@ -163,9 +172,15 @@ DE_gGP <- function(EE.seu, MA.seu,
   status_dmelnv_EE <- rep("DMelNV_infected", ncol(count_dmelnv_EE))
   cells_dmelnv_EE <- obj_dmelnv_EE@active.ident %>% as.character()
   
+  count_coinf_EE <- obj_coinf_EE@assays$CELLBENDER@counts
+  status_coinf_EE <- rep("coinfected", ncol(count_coinf_EE))
+  cells_coinf_EE <- obj_coinf_EE@active.ident %>% as.character()
+  
   uninfected_count_EE <- obj_EE_no_vir@assays$CELLBENDER@counts
   uninfected_status_EE <- rep("uninfected", ncol(uninfected_count_EE))
   uninfected_cells_EE <- obj_EE_no_vir@active.ident %>% as.character()
+  
+  # MA counts and factors
   
   infected_count_dmelnv_MA <- obj_dmelnv_MA@assays$CELLBENDER@counts
   infected_status_dmelnv_MA <- rep("DMelNV_infected", ncol(infected_count_dmelnv_MA))
@@ -179,9 +194,9 @@ DE_gGP <- function(EE.seu, MA.seu,
   
   # one count matrix for each virus dataset
   
-  count.mtx_EE <- cbind(count_tv, count_dmelnv_EE, uninfected_count_EE)
-  infection_EE <- c(status_tv_EE, status_dmelnv_EE, uninfected_status_EE) %>% factor()
-  cell_EE <- c(cells_tv_EE, cells_dmelnv_EE, uninfected_cells_EE) %>% factor()
+  count.mtx_EE <- cbind(count_tv, count_dmelnv_EE, uninfected_count_EE, count_coinf_EE)
+  infection_EE <- c(status_tv_EE, status_dmelnv_EE, uninfected_status_EE, status_coinf_EE) %>% factor()
+  cell_EE <- c(cells_tv_EE, cells_dmelnv_EE, uninfected_cells_EE, cells_coinf_EE) %>% factor()
 
   count.mtx_dmelnv_MA <- cbind(infected_count_dmelnv_MA, uninfected_count_MA)
   infection_dmelnv_MA <- c(infected_status_dmelnv_MA, uninfected_status_MA) %>% factor()
@@ -485,8 +500,8 @@ robustness_DE_gGP <- function(EE.seu, MA.seu,
 cor_gGP <- function(EE.seu, MA.seu,
                     verbose = TRUE) {
   
-  obj_tv <- subset(EE.seu, cells = colnames(EE.seu)[EE.seu$is.tv.infected])
-  obj_dmelnv_EE <- subset(EE.seu, cells = colnames(EE.seu)[EE.seu$is.dmelnv.infected])
+  obj_tv <- subset(EE.seu, cells = colnames(EE.seu)[EE.seu$is.tv.infected & !EE.seu$is.dmelnv.infected])
+  obj_dmelnv_EE <- subset(EE.seu, cells = colnames(EE.seu)[EE.seu$is.dmelnv.infected & !EE.seu$is.tv.infected])
   obj_dmelnv_MA <- subset(MA.seu, cells = colnames(MA.seu)[MA.seu$is.dmelnv.infected])
   
   count_tv <- obj_tv@assays$CELLBENDER@counts
@@ -765,4 +780,56 @@ network.pipe <- function(symbols.lst,
   
   return(out.lst)
 }
+
+# correlation between mean expression and virus susceptibility
+
+cor.virus.pct <- function() {
+  
+  tv.tb <- data.frame(gene = character(),
+                      cor = character(),
+                      t = character(),
+                      p.value = character())
+  
+  EE.tv.pct <- gather_pct.vir %>% filter(!is.na(value) & variable == "tv.pct.infected_cells")
+  EE.tv.pct <- EE.tv.pct[match(colnames(EE.mean.exp$CELLBENDER), EE.tv.pct$cell), ]
+  
+  dmelnv.tb <- data.frame(gene = character(),
+                          cor = character(),
+                          t = character(),
+                          p.value = character())
+  
+  EE.dmelnv.pct <- gather_pct.vir %>% filter(!is.na(value) & variable == "dmelnv.pct.infected_cells")
+  EE.dmelnv.pct <- EE.dmelnv.pct[match(colnames(EE.mean.exp$CELLBENDER), EE.dmelnv.pct$cell), ]
+  EE.dmelnv.pct <- EE.dmelnv.pct[!is.na(EE.dmelnv.pct$value),]
+  
+  for (cell in 1:nrow(EE.mean.exp$CELLBENDER)) {
+    
+    mean.exp <- EE.mean.exp$CELLBENDER[cell,]
+    
+    if (length(mean.exp[mean.exp > 0]) < 3) next
+    
+    tv.cor <- cor.test(mean.exp, EE.tv.pct$value)
+    tv.tb[nrow(tv.tb) + 1, ] <- list(rownames(EE.mean.exp$CELLBENDER)[cell],
+                                     tv.cor$estimate,
+                                     tv.cor$statistic,
+                                     tv.cor$p.value)
+    
+    dmelnv.cor <- cor.test(mean.exp[names(mean.exp) %in% EE.dmelnv.pct$cell], EE.dmelnv.pct$value)
+    dmelnv.tb[nrow(dmelnv.tb) + 1, ] <- list(rownames(EE.mean.exp$CELLBENDER)[cell],
+                                             dmelnv.cor$estimate,
+                                             dmelnv.cor$statistic,
+                                             dmelnv.cor$p.value)
+  }
+  
+  tv.tb$adj_p.value <- p.adjust(tv.tb$p.value, method = "BH")
+  dmelnv.tb$adj_p.value <- p.adjust(dmelnv.tb$p.value, method = "BH")
+  
+  tv.tb$symbol <- gene_symbol[match(gsub("-", "_", tv.tb$gene), gene_symbol$V1), "V3"]
+  dmelnv.tb$symbol <- gene_symbol[match(gsub("-", "_", dmelnv.tb$gene), gene_symbol$V1), "V3"]
+  
+  return(list(TV = tv.tb,
+              EE.DMelNV = dmelnv.tb))
+  
+}
+
 

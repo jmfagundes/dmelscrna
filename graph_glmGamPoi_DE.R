@@ -178,6 +178,14 @@ nora.bulk.day30 <- fread("gene_matrices/dmelnv_bulk_RNA-seq_data/NV_infected_day
                sep = "\t", dec = ",", stringsAsFactors = FALSE)
 nora.bulk.day30$day <- "30"
 
+# cuffdiff cannot differentiate the expression of overlapping genes
+# split merged genes
+
+nora.bulk.day2 <- nora.bulk.day2 %>% separate_rows(1, sep = ",")
+nora.bulk.day10 <- nora.bulk.day10 %>% separate_rows(1, sep = ",")
+nora.bulk.day20 <- nora.bulk.day20 %>% separate_rows(1, sep = ",")
+nora.bulk.day30 <- nora.bulk.day30 %>% separate_rows(1, sep = ",")
+
 nora.bulk.response <- list(`DMelNV systemic day 2 up` = (nora.bulk.day2[nora.bulk.day2$`log2(fold_change)` > 0 & nora.bulk.day2$p_value < 0.05, "gene_name"] %>% as.list())$gene_name,
                            `DMelNV systemic day 2 down` = (nora.bulk.day2[nora.bulk.day2$`log2(fold_change)` < 0 & nora.bulk.day2$p_value < 0.05, "gene_name"] %>% as.list())$gene_name,
                            `DMelNV systemic day 10 up` = (nora.bulk.day10[nora.bulk.day10$`log2(fold_change)` > 0 & nora.bulk.day10$p_value < 0.05, "gene_name"] %>% as.list())$gene_name,
@@ -189,17 +197,7 @@ nora.bulk.response <- list(`DMelNV systemic day 2 up` = (nora.bulk.day2[nora.bul
 
 nora.bulk.graph.results <- network.pipe(nora.bulk.response)
 
-# investigate translation related genes in "DMelNV (MA) negative correlation", "DMelNV I-pCCHa1 down" and "DMelNV pEC down"
-
-nora.translation_genes <- list(`DMelNV I-pCCHa1 down-regulated\ntranslation-related genes` = strsplit(nora.celltype.graph.results$`DMelNV I-pCCHa1 down`$reactome[[2]]["R-DME-72766", "geneID"], "/")[[1]],
-                               `DMelNV pEC down-regulated\ntranslation-related genes` = strsplit(nora.celltype.graph.results$`DMelNV pEC down`$reactome[[2]]["R-DME-72766", "geneID"], "/")[[1]])
-
-# save figs then rename list to save tables
-
-pdf("figures_out/fig4.pdf", width = 6.85, height = 3.5)
-layout(rbind(c(1,2)))
-network.pipe(nora.translation_genes)
-dev.off()
+# investigate translation related genes in "DMelNV I-pCCHa1 down" and "DMelNV pEC down"
 
 nora.translation_genes <- list(`DMelNV I-pCCHa1 down-regulated translation-related genes` = strsplit(nora.celltype.graph.results$`DMelNV I-pCCHa1 down`$reactome[[2]]["R-DME-72766", "geneID"], "/")[[1]],
                                `DMelNV pEC down-regulated translation-related genes` = strsplit(nora.celltype.graph.results$`DMelNV pEC down`$reactome[[2]]["R-DME-72766", "geneID"], "/")[[1]])
@@ -216,8 +214,8 @@ for (lst.index in 1:length(nora.celltype.response)) {
   
   if (length(lst) == 0) next
   
-  sc2bulk <- data.frame(systemic.lst = character(0),
-                        symbol = character(0))
+  sc2bulk <- data.frame(systemic.lst = character(),
+                        symbol = character())
   
   for (sys.degs in 1:length(nora.bulk.response)) {
     
@@ -239,8 +237,8 @@ for (lst.index in 1:length(nora.generic.response)) {
   
   if (length(lst) == 0) next
   
-  sc2bulk <- data.frame(symbol = character(0),
-                        systemic.lst = character(0))
+  sc2bulk <- data.frame(symbol = character(),
+                        systemic.lst = character())
   
   for (sys.degs in 1:length(nora.bulk.response)) {
     
@@ -291,20 +289,21 @@ nora.cellular_bulk_diff.results <- network.pipe(nora.cellular_bulk_diff)
 
 # summarize all graph and reactome results in a table
 
-all.graph.results <- data.frame(`gene_list` = character(0),
-                                `subgraph_slope` = numeric(0),
-                                `slope_diff` = numeric(0),
-                                `slope_diff_p.value` = numeric(0),
-                                `mean_betweenness` = numeric(0),
-                                `mean_betweenness_diff` = numeric(0),
-                                `betweenness_diff_p.value` = numeric(0))
+all.graph.results <- data.frame(`gene_list` = character(),
+                                `subgraph_slope` = numeric(),
+                                `slope_diff` = numeric(),
+                                `slope_diff_p.value` = numeric(),
+                                `mean_betweenness` = numeric(),
+                                `mean_betweenness_diff` = numeric(),
+                                `betweenness_diff_p.value` = numeric())
 
-all.react.results <- data.frame(`gene list` = character(0),
-                                description = character(0),
-                                p.adjust = numeric(0),
-                                q.value = numeric(0),
-                                count = numeric(0),
-                                reactome = character(0))
+all.react.results <- data.frame(`gene list` = character(),
+                                description = character(),
+                                p.adjust = numeric(),
+                                q.value = numeric(),
+                                count = numeric(),
+                                geneID = character(),
+                                reactome = character())
 
 for (lst in c(thika.graph.results,
               nora.graph.results,
@@ -318,7 +317,7 @@ for (lst in c(thika.graph.results,
   
   if (nrow(lst$reactome[[2]]) == 0) next # skip if no enrichment found
   
-  selected.reactome.cols <- lst$reactome[[2]][lst$reactome[[2]]$p.adjust < 0.05, c("Description", "p.adjust", "qvalue", "Count")]
+  selected.reactome.cols <- lst$reactome[[2]][lst$reactome[[2]]$p.adjust < 0.05, c("Description", "p.adjust", "qvalue", "Count", "geneID")]
   
   if (nrow(selected.reactome.cols) == 0) next # skip if no enriched pathway with p.adj < 0.05
   
@@ -368,10 +367,22 @@ thika_infection_tmp$symbol <- gene_symbol[match(gsub("-", "_", thika_infection_t
 nora_EE_infection_tmp$symbol <- gene_symbol[match(gsub("-", "_", nora_EE_infection_tmp$name), gene_symbol$V1), "V3"]
 nora_MA_infection_tmp$symbol <- gene_symbol[match(gsub("-", "_", nora_MA_infection_tmp$name), gene_symbol$V1), "V3"]
 
+thika_cor.tmp <- thika.cor.gampoi
+nora_EE_cor.tmp <- nora_EE.cor.gampoi
+nora_MA_cor.tmp <- nora_MA.cor.gampoi
+
+thika_cor.tmp$symbol <- gene_symbol[match(gsub("-", "_", thika_cor.tmp$name), gene_symbol$V1), "V3"]
+nora_EE_cor.tmp$symbol <- gene_symbol[match(gsub("-", "_", nora_EE_cor.tmp$name), gene_symbol$V1), "V3"]
+nora_MA_cor.tmp$symbol <- gene_symbol[match(gsub("-", "_", nora_MA_cor.tmp$name), gene_symbol$V1), "V3"]
+
 write_xlsx(c(list(`TV generic response` = thika_infection_tmp,
                   `TV posterior EEs response` = thika_posterior_tmp,
                   `DMelNV (EE) generic response` = nora_EE_infection_tmp,
-                  `DMelNV (MA) generic response` = nora_MA_infection_tmp),
+                  `DMelNV (MA) generic response` = nora_MA_infection_tmp,
+                  `TV correlation` = thika_cor.tmp,
+                  `DMelNV (EE) correlation` = nora_EE_cor.tmp,
+                  `DMelNV (MA) correlation` = nora_MA_cor.tmp,
+                  coinfection = coinfection.DE.tmp),
              thika_cell_tmp, nora_cell_tmp,
              list(`common cellular systemic DMelNV` = nora_dmel_sc2bulk.tb)), "Supplementary 1.xlsx")
 
@@ -380,7 +391,10 @@ write_xlsx(c(list(`TV generic response` = thika_infection_tmp,
 all_DE <- bind_rows(c(list(`TV generic response` = thika_infection_tmp,
                            `TV posterior EEs response` = thika_posterior_tmp,
                            `DMelNV (EE) generic response` = nora_EE_infection_tmp,
-                           `DMelNV (MA) generic response` = nora_MA_infection_tmp),
+                           `DMelNV (MA) generic response` = nora_MA_infection_tmp,
+                           `TV correlation` = thika_cor.tmp,
+                           `DMelNV (EE) correlation` = nora_EE_cor.tmp,
+                           `DMelNV (MA) correlation` = nora_MA_cor.tmp),
                       thika_cell_tmp, nora_cell_tmp), .id = "response")
 
 all_DE$symbol <- gene_symbol[match(gsub("-", "_", all_DE$name), gene_symbol$V1), "V3"]
@@ -396,14 +410,40 @@ all_DE_capped <- all_DE
 all_DE_capped[all_DE$lfc < -5, "lfc"] <- -5
 all_DE_capped[all_DE$lfc > 5, "lfc"] <- 5
 
-ggvolcano <- ggplot(all_DE_capped[all_DE_capped$symbol %in% all_DEGs,], aes(x = lfc, y = -log10(adj_pval))) +
+# complete volcano plots without labels
+
+ggvolcano <- ggplot(all_DE_capped, aes(x = lfc, y = -log10(adj_pval))) +
   geom_point(size = 0.4, aes(color = adj_pval < 0.05)) +
-  xlim(-5, 5) +
   facet_wrap(~response, ncol = 4) +
   ylab(label = "adjusted P-values (-log10)") + xlab(label = "fold change (log2)") +
   theme(legend.position = "none", strip.text.x = element_text(size = 7.25))
 
-ggsave("figures_out/fig3.pdf", ggvolcano, width = 174, height = 200, units = "mm")
+ggsave("figures_out/complete_volcano_plots.pdf", ggvolcano, width = 174, height = 200, units = "mm")
+
+# volcano plots with heat shock-related labels
+# get list of proteins from Cellular response to heat stress
+
+R_DME_3371556 <- read.table("Participating Molecules [R-DME-3371556].tsv", sep = "\t", header = TRUE)[1:3]
+
+heatshock.proteins <- select(org.Dm.eg.db, R_DME_3371556$Identifier, "SYMBOL", "UNIPROT")
+
+all_DE_capped_heat.shock <- all_DE_capped %>%
+  filter(symbol %in% heatshock.proteins$SYMBOL)
+
+all_DE_capped_heat.shock <- all_DE_capped_heat.shock %>%
+  filter(response %in% unique(all_DE_capped_heat.shock[all_DE_capped_heat.shock$adj_pval < 0.05, "response"]))
+
+ggvolcano.heat <- ggplot(all_DE_capped_heat.shock,
+                         aes(x = lfc, y = -log10(adj_pval))) +
+  geom_point(size = 0.4, aes(color = adj_pval < 0.05)) +
+  geom_text_repel(data = all_DE_capped_heat.shock %>% filter(adj_pval < 0.05),
+                  aes(x = lfc, y = -log10(adj_pval),
+                  label = symbol), size = 2, segment.size = .2, seed = 255) +
+  facet_wrap(~response, ncol = 4) +
+  ylab(label = "adjusted P-values (-log10)") + xlab(label = "fold change (log2)") +
+  theme(legend.position = "none", strip.text.x = element_text(size = 7.25))
+
+ggsave("figures_out/fig4.pdf", ggvolcano.heat, width = 174, height = 150, units = "mm")
 
 # number of DEGs for each test
 
@@ -411,12 +451,337 @@ n.DEGs <- data.frame(response = all_DE$response %>% levels(),
                      up = all_DE[all_DE$adj_pval < 0.05 & all_DE$lfc > 0, "response"] %>% table() %>% as.integer(),
                      down = all_DE[all_DE$adj_pval < 0.05 & all_DE$lfc < 0, "response"] %>% table() %>% as.integer())
 
+n.DEGs$virus <- n.DEGs$response %>% gsub(" .*", "", .)
+n.DEGs$response <- n.DEGs$response %>% gsub("(TV|DMelNV|DMelNV \\(EE\\)) ", "", .)
+n.DEGs$response <- factor(n.DEGs$response, levels = c("generic response", "I-a", "III", "I-ap-a", "II-a",
+                                                      "I-m", "II-m1", "II-m2",
+                                                      "II-p", "I-ap-p", "I-pCCHa1", "I-pAstA", "posterior EEs response",
+                                                      "(MA) generic response", "ISC/EB",
+                                                      "EE", "unk", "cardia", "aEC",
+                                                      "mEC", "copper/iron", "LFC",
+                                                      "pEC", "correlation", "(MA) correlation"))
+
+# barplot of DEGs
+
+n.DEGs$down <- -n.DEGs$down
+n.DEGs[n.DEGs$up == 0, "up"] <- NA
+n.DEGs[n.DEGs$down == 0, "down"] <- NA
+
+# reactome figure
+
+cell.react.results <- list(DMelNV = all.react.results[!grepl("systemic", all.react.results$`gene list`) &
+                                                        grepl("DMelNV", all.react.results$`gene list`),],
+                           TV = all.react.results[grepl("TV", all.react.results$`gene list`),])
+
+# plot reactome pathways as networks
+
+# TV
+
+TV.reactome.edges <- cell.react.results$TV %>%
+  dplyr::select(c("Description", "geneID", "gene list")) %>%
+  separate_rows(2, sep = "/")
+
+TV.reactome.net <- graph_from_edgelist(as.matrix(TV.reactome.edges[1:2]))
+
+V(TV.reactome.net)$color <- ifelse(names(V(TV.reactome.net)) %in% TV.reactome.edges$geneID, "#00BFC4", "grey")
+V(TV.reactome.net)$pathway <- TV.reactome.edges$Description[match(names(V(TV.reactome.net)), TV.reactome.edges$Description)]
+V(TV.reactome.net)$gene <- TV.reactome.edges$geneID[match(names(V(TV.reactome.net)), TV.reactome.edges$geneID)]
+
+# set seed to layout
+
+set.seed(255)
+TV.reactome.net.dh.lay <- create_layout(TV.reactome.net, layout = "dh")
+set.seed(2)
+TV.reactome.net.fr.lay <- create_layout(TV.reactome.net, layout = "fr")
+
+# DMelNV 
+
+DMelNV.reactome.edges.down <- cell.react.results$DMelNV %>%
+  filter(grepl("down", cell.react.results$DMelNV$`gene list`) & !grepl("translation", cell.react.results$DMelNV$`gene list`)) %>%
+  dplyr::select(c("Description", "geneID", "gene list")) %>%
+  separate_rows(2, sep = "/")
+
+DMelNV.reactome.net.down <- graph_from_edgelist(as.matrix(DMelNV.reactome.edges.down[1:2]))
+
+V(DMelNV.reactome.net.down)$color <- ifelse(names(V(DMelNV.reactome.net.down)) %in% DMelNV.reactome.edges.down$geneID, "#F8766D", "grey")
+V(DMelNV.reactome.net.down)$pathway <- DMelNV.reactome.edges.down$Description[match(names(V(DMelNV.reactome.net.down)), DMelNV.reactome.edges.down$Description)]
+V(DMelNV.reactome.net.down)$gene <- DMelNV.reactome.edges.down$geneID[match(names(V(DMelNV.reactome.net.down)), DMelNV.reactome.edges.down$geneID)]
+
+# set seed to dh layout
+
+set.seed(100)
+DMelNV.reactome.net.down.dh.lay <- create_layout(DMelNV.reactome.net.down, layout = "dh")
+
+DMelNV.reactome.edges.up <- cell.react.results$DMelNV %>%
+  filter(grepl("up", cell.react.results$DMelNV$`gene list`)) %>%
+  dplyr::select(c("Description", "geneID", "gene list")) %>%
+  separate_rows(2, sep = "/")
+
+DMelNV.reactome.net.up <- graph_from_edgelist(as.matrix(DMelNV.reactome.edges.up[1:2]))
+
+V(DMelNV.reactome.net.up)$color <- ifelse(names(V(DMelNV.reactome.net.up)) %in% DMelNV.reactome.edges.up$geneID, "#00BFC4", "grey")
+V(DMelNV.reactome.net.up)$pathway <- DMelNV.reactome.edges.up$Description[match(names(V(DMelNV.reactome.net.up)), DMelNV.reactome.edges.up$Description)]
+V(DMelNV.reactome.net.up)$gene <- DMelNV.reactome.edges.up$geneID[match(names(V(DMelNV.reactome.net.up)), DMelNV.reactome.edges.up$geneID)]
+
+# set seed to dh layout
+
+set.seed(255)
+DMelNV.reactome.net.up.dh.lay <- create_layout(DMelNV.reactome.net.up, layout = "dh")
+
+# make figure 3
+
+ggbarplot <- ggplot(n.DEGs %>% 
+                      pivot_longer(!response & !virus, names_to = "regulation"),
+                    aes(x = response, y = value, fill = regulation)) +
+  geom_col() +
+  ggtitle("A") +
+  facet_wrap(~virus, ncol = 1) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(angle = 0, hjust = 0),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+        legend.position = "top",
+        legend.text = element_text(size = 8),
+        plot.title = element_text(margin = margin(t = 0, b = -15), hjust = -.2),
+        legend.key.size = unit(.5, "cm")) +
+  scale_y_continuous(breaks = c(-100, 0 , 100, 200), labels = c(100, 0 , 100, 200)) +
+  ylab(label = "number of DEGs") +
+  scale_fill_discrete(name = "", labels = c("down-regulated", "up-regulated")) +
+  xlab("")
+
+gg.TV.reactome.net <- ggraph(TV.reactome.net.fr.lay) +
+  geom_edge_link(color = "grey85") + 
+  geom_node_point(color = V(TV.reactome.net)$color) +
+  geom_node_text(aes(label = V(TV.reactome.net)$pathway), size = 1.25, color = "black", repel = TRUE, seed = 10, segment.size = .2) +
+  geom_node_text(aes(label = V(TV.reactome.net)$gene), size = .75, color = "grey10") +
+  theme_void() +
+  ggtitle("C    TV")
+
+gg.DMelNV.reactome.net.down <- ggraph(DMelNV.reactome.net.down.dh.lay) +
+  geom_edge_link(color = "grey85") + 
+  geom_node_point(color = V(DMelNV.reactome.net.down)$color) +
+  geom_node_text(aes(label = V(DMelNV.reactome.net.down)$pathway), size = 1.25, color = "black", repel = TRUE, force = 100, seed = 2, segment.size = .2) +
+  geom_node_text(aes(label = V(DMelNV.reactome.net.down)$gene), size = .75, color = "grey10") +
+  theme_void() +
+  ggtitle("B                                                          DMelNV")
+
+gg.DMelNV.reactome.net.up <- ggraph(DMelNV.reactome.net.up.dh.lay) +
+  geom_edge_link(color = "grey85") + 
+  geom_node_point(color = V(DMelNV.reactome.net.up)$color) +
+  geom_node_text(aes(label = V(DMelNV.reactome.net.up)$pathway), size = 1.25, color = "black", repel = TRUE, force = 100, seed = 16, segment.size = .2, max.time = 5) +
+  geom_node_text(aes(label = V(DMelNV.reactome.net.up)$gene), size = .75, color = "grey10") +
+  theme_void()
+
+g <- ggarrange(ggbarplot, gg.TV.reactome.net,
+               gg.DMelNV.reactome.net.down, gg.DMelNV.reactome.net.up,
+               common.legend = TRUE, legend = "top",
+               heights = c(1, 1.5))
+
+ggsave("figures_out/fig3.pdf", g, width = 174, height = 234, units = "mm")
+
 # clear space
 
 rm(thika_infection_tmp, nora_EE_infection_tmp, nora_MA_infection_tmp,
    thika_cell_tmp, nora_cell_tmp)
 
+# test if any individual gene in the cellular response is an articulation point
+
+dro_net.articulation.points <- articulation_points(dro_net) %>% names()
+
+DE_articulation.point <- all_DE %>% filter(symbol %in% dro_net.articulation.points & adj_pval < 0.05)
+
+# articulation points in late systemic response
+
+bulk_articulation.point <- list(down20 = nora.bulk.response$`DMelNV systemic day 20 down`[nora.bulk.response$`DMelNV systemic day 20 down` %in% dro_net.articulation.points],
+                                down30 = nora.bulk.response$`DMelNV systemic day 30 down`[nora.bulk.response$`DMelNV systemic day 30 down` %in% dro_net.articulation.points])
+
+# test if correlated genes are articulation points
+
+cor_articulation.point <- rbind(thika.cor.gampoi_significant %>% filter(symbol %in% dro_net.articulation.points & adj_pval < 0.05),
+                                nora_EE.cor.gampoi_significant %>% filter(symbol %in% dro_net.articulation.points & adj_pval < 0.05),
+                                nora_MA.cor.gampoi_significant %>% filter(symbol %in% dro_net.articulation.points & adj_pval < 0.05))
+
+cor_articulation.point$response <- c(rep("TV", nrow(thika.cor.gampoi_significant %>% filter(symbol %in% dro_net.articulation.points & adj_pval < 0.05))),
+                                     rep("DMelNV EE", nrow(nora_EE.cor.gampoi_significant %>% filter(symbol %in% dro_net.articulation.points & adj_pval < 0.05))),
+                                     rep("DMelNV MA", nrow(nora_MA.cor.gampoi_significant %>% filter(symbol %in% dro_net.articulation.points & adj_pval < 0.05))))
+
+# plot number of DEGs in bulk RNA-seq and pathway enrichment
+
+n.DEGs_nora.bulk.response <- data.frame(`up-regulated` = c(length(nora.bulk.response$`DMelNV systemic day 2 up`),
+                                                           length(nora.bulk.response$`DMelNV systemic day 10 up`),
+                                                           length(nora.bulk.response$`DMelNV systemic day 20 up`),
+                                                           length(nora.bulk.response$`DMelNV systemic day 30 up`)),
+                                        `down-regulated` = -c(length(nora.bulk.response$`DMelNV systemic day 2 down`),
+                                                              length(nora.bulk.response$`DMelNV systemic day 10 down`),
+                                                              length(nora.bulk.response$`DMelNV systemic day 20 down`),
+                                                              length(nora.bulk.response$`DMelNV systemic day 30 down`)),
+                                        `days post-eclosion` = c("day 2", "day 10", "day 20", "day 30"))
+
+n.DEGs_nora.bulk.response$days.post.eclosion <- factor(n.DEGs_nora.bulk.response$days.post.eclosion, levels = n.DEGs_nora.bulk.response$days.post.eclosion)
+
+ggbarplot.bulk <- ggplot(n.DEGs_nora.bulk.response %>% 
+                           pivot_longer(!`days.post.eclosion`, names_to = "regulation"),
+                    aes(x = `days.post.eclosion`, y = value, fill = regulation)) +
+  geom_col() +
+  ggtitle("A") +
+  theme(strip.background = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+        legend.position = "top",
+        legend.text = element_text(size = 6),
+        plot.title = element_text(margin = margin(t = 0, b = -15), hjust = -.4),
+        legend.key.size = unit(.5, "cm")) +
+  scale_y_continuous(breaks = c(-2300, 0 , 1350, 2700), labels = c(2300, 0 , 1350, 2700)) +
+  ylab(label = "number of DEGs") +
+  scale_fill_discrete(name = "", labels = c("down-regulated", "up-regulated")) +
+  xlab("")
+
+# plot complement cascade network from bulk RNA-seq and cellular positive correlation down-regulated at 20-30 days post-eclosion in systemic response
+
+systemic.complement <- all.react.results %>%
+  filter(grepl("Complement cascade", Description) & grepl("DMelNV systemic", `gene list`)) %>%
+  dplyr::select(c("Description", "geneID", "gene list")) %>%
+  separate_rows(2, sep = "/")
+
+systemic.complement.net <- graph_from_edgelist(as.matrix(systemic.complement[1:2]))
+
+V(systemic.complement.net)$color <- ifelse(names(V(systemic.complement.net)) %in% systemic.complement$geneID, "#00BFC4", "grey")
+V(systemic.complement.net)$pathway <- systemic.complement$Description[match(names(V(systemic.complement.net)), systemic.complement$Description)]
+V(systemic.complement.net)$gene <- systemic.complement$geneID[match(names(V(systemic.complement.net)), systemic.complement$geneID)]
+
+set.seed(100)
+systemic.complement.net.dh.lay <- create_layout(systemic.complement.net, layout = "dh")
+
+gg.systemic.complement.net <- ggraph(systemic.complement.net.dh.lay) +
+  geom_edge_link(color = "grey85") + 
+  geom_node_point(color = V(systemic.complement.net)$color) +
+  geom_node_text(aes(label = V(systemic.complement.net)$pathway), size = 1.25, color = "black", repel = TRUE, force = 100, seed = 2, segment.size = .2) +
+  geom_node_text(aes(label = V(systemic.complement.net)$gene), size = .75, color = "grey10") +
+  theme_void() +
+  ggtitle(" B")
+
+positive.cor_systemic.down.edges <- all.react.results %>%
+  filter(grepl("positive.*systemic down", `gene list`)) %>%
+  dplyr::select(c("Description", "geneID", "gene list")) %>%
+  separate_rows(2, sep = "/")
+
+positive.cor_systemic.down.net <- graph_from_edgelist(as.matrix(positive.cor_systemic.down.edges[1:2]))
+
+V(positive.cor_systemic.down.net)$color <- ifelse(names(V(positive.cor_systemic.down.net)) %in% positive.cor_systemic.down.edges$geneID, "#C77CFF", "grey")
+V(positive.cor_systemic.down.net)$pathway <- positive.cor_systemic.down.edges$Description[match(names(V(positive.cor_systemic.down.net)), positive.cor_systemic.down.edges$Description)]
+V(positive.cor_systemic.down.net)$gene <- positive.cor_systemic.down.edges$geneID[match(names(V(positive.cor_systemic.down.net)), positive.cor_systemic.down.edges$geneID)]
+
+set.seed(100)
+positive.cor_systemic.down.net.dh.lay <- create_layout(positive.cor_systemic.down.net, layout = "dh")
+
+gg.positive.cor_systemic.down.net <- ggraph(positive.cor_systemic.down.net.dh.lay) +
+  geom_edge_link(color = "grey85") + 
+  geom_node_point(color = V(positive.cor_systemic.down.net)$color) +
+  geom_node_text(aes(label = V(positive.cor_systemic.down.net)$pathway), size = 1.25, color = "black", repel = TRUE, force = 100, seed = 2, segment.size = .2) +
+  geom_node_text(aes(label = V(positive.cor_systemic.down.net)$gene), size = .75, color = "grey10") +
+  theme_void() +
+  ggtitle("C")
+
+g <- ggarrange(ggbarplot.bulk, gg.systemic.complement.net,
+               gg.positive.cor_systemic.down.net,
+               legend = "top", nrow = 1)
+
+ggsave("figures_out/fig6.pdf", g, width = 174, height = 70, units = "mm")
+
+# articulation points and translation-related hubs
+
+# number of articulation points in each DEG list
+
+n.articulation_nora.bulk.response <- data.frame(response = c("day 2", "day 10", "day 20", "day 30"),
+                                                up = c(length(nora.bulk.response$`DMelNV systemic day 2 up`[nora.bulk.response$`DMelNV systemic day 2 up` %in% dro_net.articulation.points]),
+                                                       length(nora.bulk.response$`DMelNV systemic day 10 up`[nora.bulk.response$`DMelNV systemic day 10 up` %in% dro_net.articulation.points]),
+                                                       length(nora.bulk.response$`DMelNV systemic day 20 up`[nora.bulk.response$`DMelNV systemic day 20 up` %in% dro_net.articulation.points]),
+                                                       length(nora.bulk.response$`DMelNV systemic day 30 up`[nora.bulk.response$`DMelNV systemic day 30 up` %in% dro_net.articulation.points])),
+                                                down = -c(length(nora.bulk.response$`DMelNV systemic day 2 down`[nora.bulk.response$`DMelNV systemic day 2 down` %in% dro_net.articulation.points]),
+                                                          length(nora.bulk.response$`DMelNV systemic day 10 down`[nora.bulk.response$`DMelNV systemic day 10 down` %in% dro_net.articulation.points]),
+                                                          length(nora.bulk.response$`DMelNV systemic day 20 down`[nora.bulk.response$`DMelNV systemic day 20 down` %in% dro_net.articulation.points]),
+                                                          length(nora.bulk.response$`DMelNV systemic day 30 down`[nora.bulk.response$`DMelNV systemic day 30 down` %in% dro_net.articulation.points])),
+                                                virus ="DMelNV systemic")
+
+n.articulation_nora.bulk.response$response <- factor(n.articulation_nora.bulk.response$response, levels = c("day 2", "day 10", "day 20", "day 30"))
+
+n.articulation_nora.bulk.response[n.articulation_nora.bulk.response$up == 0, "up"] <- NA
+n.articulation_nora.bulk.response[n.articulation_nora.bulk.response$down == 0, "down"] <- NA
+
+gg.n.articulation_nora.bulk.response <- ggplot(n.articulation_nora.bulk.response %>% 
+                                                 pivot_longer(!response & !virus, names_to = "regulation"),
+                                               aes(x = response, y = value, fill = regulation)) +
+  geom_col() +
+  facet_wrap(~virus, ncol = 1) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(angle = 0, hjust = 0),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+        legend.position = "top",
+        legend.text = element_text(size = 8),
+        plot.title = element_text(margin = margin(t = 0, b = -15), hjust = -.2, vjust = .1),
+        legend.key.size = unit(.5, "cm")) +
+  scale_y_continuous(breaks = c(-100, -50, 0, 50, 100), labels = c(100, 50, 0, 50, 100)) +
+  ylab(label = "") +
+  scale_fill_discrete(name = "", labels = c("down-regulated", "up-regulated")) +
+  xlab("")
+
+n.articulation <- data.frame(response = all_DE$response %>% levels(),
+                             up = all_DE[all_DE$adj_pval < 0.05 & all_DE$lfc > 0 & all_DE$symbol %in% dro_net.articulation.points, "response"] %>% table() %>% as.integer(),
+                             down = all_DE[all_DE$adj_pval < 0.05 & all_DE$lfc < 0 & all_DE$symbol %in% dro_net.articulation.points, "response"] %>% table() %>% as.integer())
+
+n.articulation$virus <- n.articulation$response %>% gsub(" .*", "", .)
+n.articulation$response <- n.articulation$response %>% gsub("(TV|DMelNV|DMelNV \\(EE\\)) ", "", .)
+n.articulation$response <- factor(n.articulation$response, levels = c("generic response", "I-a", "III", "I-ap-a", "II-a",
+                                                      "I-m", "II-m1", "II-m2",
+                                                      "II-p", "I-ap-p", "I-pCCHa1", "I-pAstA", "posterior EEs response",
+                                                      "(MA) generic response", "ISC/EB",
+                                                      "EE", "unk", "cardia", "aEC",
+                                                      "mEC", "copper/iron", "LFC",
+                                                      "pEC", "correlation", "(MA) correlation"))
+
+n.articulation$down <- -n.articulation$down
+n.articulation[n.articulation$up == 0, "up"] <- NA
+n.articulation[n.articulation$down == 0, "down"] <- NA
+
+all_n.articulation <- rbind(n.articulation_nora.bulk.response,
+                            n.articulation)
+
+gg.n.articulation <- ggplot(n.articulation %>% 
+         pivot_longer(!response & !virus, names_to = "regulation"),
+       aes(x = response, y = value, fill = regulation)) +
+  geom_col() +
+  ggtitle("A") +
+  facet_wrap(~virus, ncol = 1) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(angle = 0, hjust = 0),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
+        legend.position = "top",
+        legend.text = element_text(size = 8),
+        plot.title = element_text(margin = margin(t = 0, b = -15), hjust = -.1),
+        legend.key.size = unit(.5, "cm")) +
+  scale_y_continuous(breaks = c(-10, -5, 0, 5, 10), labels = c(10, 5, 0, 5, 10)) +
+  ylab(label = "number of articulation points") +
+  scale_fill_discrete(name = "", labels = c("down-regulated", "up-regulated")) +
+  xlab("")
+
+g.articulation <- ggarrange(gg.n.articulation, ggarrange(gg.n.articulation_nora.bulk.response, "", ncol = 1, legend = "none", heights = c(1, .8)),
+                            common.legend = TRUE, legend = "top")
+
+# hubs
+
+nora.translation_genes.newline <- list(`DMelNV I-pCCHa1 down-regulated\ntranslation-related genes` = strsplit(nora.celltype.graph.results$`DMelNV I-pCCHa1 down`$reactome[[2]]["R-DME-72766", "geneID"], "/")[[1]],
+                                       `DMelNV pEC down-regulated\ntranslation-related genes` = strsplit(nora.celltype.graph.results$`DMelNV pEC down`$reactome[[2]]["R-DME-72766", "geneID"], "/")[[1]])
+
 # reactome and network analyses results
 
 write_xlsx(list(`reactome results` = all.react.results,
-                `network analysis results` = all.graph.results), "Supplementary 2.xlsx")
+                `network analysis results` = all.graph.results,
+                `articulation points` = dro_net.articulation.points %>% as.data.frame()), "Supplementary 2.xlsx")
+
+# save figs
+
+ggsave("figures_out/fig7A.pdf", g.articulation, width = 6.85, height = 3.5)
+
+pdf("figures_out/fig7B.pdf", width = 6.85, height = 3.5)
+layout(rbind(c(1,2)))
+network.pipe(nora.translation_genes.newline)
+dev.off()
+

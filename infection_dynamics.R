@@ -81,7 +81,6 @@ infect.stats <- data.frame(cell = levels(virus_pct_per_cell$cell),
                            tv.n.infected_cells = table(virus_pct_per_cell[virus_pct_per_cell$tv.infection & !virus_pct_per_cell$dmelnv.infection, "cell"]) %>% as.numeric(),
                            dmelnv.n.infected_cells = table(virus_pct_per_cell[virus_pct_per_cell$dmelnv.infection & !virus_pct_per_cell$tv.infection, "cell"]) %>% as.numeric())
 
-
 # integrate EEs from both datasets
 
 EE_mda <- subset(mda_10x_merged, idents = "EE")
@@ -124,7 +123,7 @@ gather_n.vir$variable <- factor(gather_n.vir$variable, levels = c("tv.n.infected
 cells_barplot <- ggplot(gather_n.vir, aes(fill = variable, y = value, x = cell)) +
   geom_bar(position = "stack", stat = "identity") +
   scale_fill_viridis(discrete = TRUE, name = "", 
-                     labels = c("TV infected", "DMelNV infected", "coinfected", "uninfected")) +
+                     labels = c("TV-infected", "DMelNV-infected", "coinfected", "uninfected")) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         legend.position = "top") + guides(fill = guide_legend(nrow = 2, byrow = TRUE)) +
   ylab(label = "number of cells") + xlab(label = element_blank())
@@ -151,3 +150,88 @@ g <- arrangeGrob(gg_tv.pct, gg_dv.pct,
 
 ggsave("figures_out/fig2.pdf", g, width = 174, height = 234, units = "mm")
 
+# correlation between mean expression and virus susceptibility
+# see if correlated genes are DE between cell types
+
+load("objs/glm.vir_glmGamPoi.Rdata")
+
+EE.uninfected.seu <- subset(dmel_filtered, subset = percent.thika == 0 & percent.nora == 0 & percent.dmelc == 0,
+                            idents = c("I-m", "II-m1", "I-ap-p", "II-a", "II-m2", "I-pAstA", "I-pCCHa1", "II-p", "I-ap-a", "I-a", "III"))
+
+# log-normalize based on size factors obtained from glmGamPoi
+
+EE.uninfected.seu[["CELLBENDER"]]@data <- t(glm.vir$EE$fit$size_factors[match(colnames(EE.uninfected.seu), names(glm.vir$EE$fit$size_factors))]*
+                                              t(EE.uninfected.seu@assays$CELLBENDER@counts)) %>% log1p()
+
+EE.mean.exp <- AverageExpression(EE.uninfected.seu, assays = "CELLBENDER", slot = "data")
+
+# investigate whether infection can change cell clusters
+
+tv.EE.exp <- virus_pct_per_cell[virus_pct_per_cell$dataset == "EE", "tv.exp"]
+tv.EE.exp[!virus_pct_per_cell[virus_pct_per_cell$dataset == "EE", "tv.infection"]] <- 0
+
+dmelnv.EE.exp <- virus_pct_per_cell[virus_pct_per_cell$dataset == "EE", "dmelnv.exp"]
+dmelnv.EE.exp[!virus_pct_per_cell[virus_pct_per_cell$dataset == "EE", "dmelnv.infection"]] <- 0
+
+dmelnv.MA.exp <- virus_pct_per_cell[virus_pct_per_cell$dataset == "MA", "dmelnv.exp"]
+dmelnv.MA.exp[!virus_pct_per_cell[virus_pct_per_cell$dataset == "MA", "dmelnv.infection"]] <- 0
+
+dmel_filtered <- AddMetaData(dmel_filtered, metadata = tv.EE.exp, col.name = "TV.log.normalized.counts")
+dmel_filtered <- AddMetaData(dmel_filtered, metadata = dmelnv.EE.exp, col.name = "DMelNV.log.normalized.counts")
+mda_10x_merged <- AddMetaData(mda_10x_merged, metadata = dmelnv.MA.exp, col.name = "DMelNV.log.normalized.counts")
+
+gg.tv.exp <- FeaturePlot(dmel_filtered, features = "TV.log.normalized.counts", label = TRUE, label.size = 2) + ggtitle("A                       TV") +
+  theme(plot.title = element_text(hjust = -3)) +
+  ylab(label = element_blank()) + xlab(label = element_blank())
+
+gg.dmelnv.EE.exp <- FeaturePlot(dmel_filtered, features = "DMelNV.log.normalized.counts", label = TRUE, label.size = 2) + ggtitle("DMelNV (EE)") +
+  ylab(label = element_blank()) + xlab(label = element_blank())
+
+gg.dmelnv.MA.exp <- FeaturePlot(mda_10x_merged, features = "DMelNV.log.normalized.counts", reduction = "tsne", label = TRUE, label.size = 2) + ggtitle("DMelNV (MA)") +
+  ylab(label = element_blank()) + xlab(label = element_blank())
+
+# test I-pAstA cluster
+
+ipasta <- subset(dmel_filtered, ident = "I-pAstA")
+ipasta@active.assay <- "CELLBENDER"
+
+ipasta <- NormalizeData(ipasta)
+ipasta <- ScaleData(ipasta, vars.to.regress = c("percent.mito", "percent.vir"))
+ipasta <- FindVariableFeatures(ipasta)
+
+ipasta <- RunPCA(ipasta, features = VariableFeatures(object = ipasta))
+
+# cluster generation
+
+ipasta <- FindNeighbors(ipasta, dims = 1:20)
+ipasta <- FindClusters(ipasta, resolution = .5)
+
+ipasta <- RunTSNE(ipasta, dims = 1:20)
+
+gg.tv.exp.ipasta <- FeaturePlot(ipasta, features = "TV.log.normalized.counts", label = TRUE, pt.size = 0.5) + ggtitle("B                       TV") +
+  theme(plot.title = element_text(hjust = -3)) +
+  ylab(label = element_blank()) + xlab(label = element_blank())
+
+gg.dmelnv.EE.exp.ipasta <- FeaturePlot(ipasta, features = "DMelNV.log.normalized.counts", label = TRUE, pt.size = 0.5) + ggtitle("DMelNV") +
+  ylab(label = element_blank()) + xlab(label = element_blank())
+
+ipasta.markers <- FindAllMarkers(ipasta, only.pos = TRUE)
+ipasta.markers$symbol <- gene_symbol[match(gsub("-", "_", ipasta.markers$gene), gene_symbol$V1), "V3"]
+
+ipasta.markers %>%
+  group_by(cluster) %>%
+  slice_max(n = 10, order_by = avg_log2FC) %>% as.data.frame()
+
+# save fig
+
+gg.fig8a <- arrangeGrob(gg.tv.exp, gg.dmelnv.EE.exp, gg.dmelnv.MA.exp,
+                        ncol = 2, left = "tSNE_2", bottom = "tSNE_1")
+
+gg.fig8b <- arrangeGrob(gg.tv.exp.ipasta, gg.dmelnv.EE.exp.ipasta,
+                        ncol = 2, left = "tSNE_2", bottom = "tSNE_1")
+
+ggsave("figures_out/fig8.pdf", arrangeGrob(gg.fig8a, gg.fig8b,
+                                           layout_matrix = rbind(1,
+                                                                 1,
+                                                                 2)),
+                                           width = 174, height = 234, units = "mm")

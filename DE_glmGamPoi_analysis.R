@@ -347,14 +347,34 @@ thika.cor.gampoi_significant$symbol <- gene_symbol[match(gsub("-", "_", thika.co
 nora_EE.cor.gampoi_significant <- nora_EE.cor.gampoi[nora_EE.cor.gampoi$adj_pval < 0.05,]
 nora_EE.cor.gampoi_significant$symbol <- gene_symbol[match(gsub("-", "_", nora_EE.cor.gampoi_significant$name), gene_symbol$V1), "V3"]
 
-nora_MA.cor.gampoi_significant <- nora_MA.cor.gampoi[nora_MA.cor.gampoi $adj_pval < 0.05,]
+nora_MA.cor.gampoi_significant <- nora_MA.cor.gampoi[nora_MA.cor.gampoi$adj_pval < 0.05,]
 nora_MA.cor.gampoi_significant$symbol <- gene_symbol[match(gsub("-", "_", nora_MA.cor.gampoi_significant$name), gene_symbol$V1), "V3"]
 
+# coinfection DEGs
+
+coinfection.contrast <- makeContrasts(coinf = (groupingEEcoinfected.I_ap_p + 
+                                                 groupingEEcoinfected.I_m +
+                                                 groupingEEcoinfected.I_pAstA +
+                                                 groupingEEcoinfected.II_m1 +
+                                                 groupingEEcoinfected.II_p)/5 -
+                                        (groupingEEuninfected.I_ap_p +
+                                           groupingEEuninfected.I_m +
+                                           groupingEEuninfected.I_pAstA +
+                                           groupingEEuninfected.II_m1 +
+                                           groupingEEuninfected.II_p)/5, levels = glm.vir$EE$design)
+
+coinfection.DE <- test_de(glm.vir$EE$fit, contrast = coinfection.contrast[,"coinf"],
+                           sort_by = pval)
+
+coinfection.DE$symbol <- gene_symbol[match(gsub("-", "_", coinfection.DE$name), gene_symbol$V1), "V3"]
+
 if(save_steps) {
+  
   save(glm.vir, thika_gGP_infection, nora_EE_gGP_infection, nora_MA_gGP_infection, 
        thika_gGP_oneway_DE, nora_gGP_oneway_DE,
        thika_region_DE, nora_major_DE,
        cor.glm.GamPoi,
        thika.cor.gampoi, nora_EE.cor.gampoi, nora_MA.cor.gampoi,
+       coinfection.DE,
        file = "objs/glm.vir_glmGamPoi.Rdata")
 }
